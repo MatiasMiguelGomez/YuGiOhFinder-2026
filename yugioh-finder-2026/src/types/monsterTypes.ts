@@ -6,7 +6,6 @@ import {
 } from "./genericTypes";
 
 // Monster Types
-
 export type LinkMarkers =
   | "Top"
   | "Bottom"
