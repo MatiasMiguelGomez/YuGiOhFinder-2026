@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { getAllCards } from "./services/getCards";
+import { getAllCards, type CardPayload } from "./services/getCards";
 
 function App() {
-  const [cards, setCards] = useState([]);
+  const [cards, setCards] = useState<CardPayload[]>([]);
   useEffect(() => {
     const getCards = async () => {
       try {
@@ -20,25 +20,35 @@ function App() {
     getCards();
   }, []);
 
-  // const cardsWithType = cards.map((card) => ({type: card.type, card}))
-  const uniqueCards = new Map(cards.map(card => [card.type, card]));
-  const uniqueCardsArray = Array.from(uniqueCards.values());
-  console.log("Estos son los tipos y sus subtipos:", uniqueCardsArray)
+  const getOneExamplePerSubtype = (cards, cardType) => {
+    const map = new Map();
 
-  const monsterCards = cards.filter((card) => card.race && !card.race.includes("Skill"));
-  const uniqueMonsterCards = new Set(monsterCards.map(card => card.race));
-  console.log("Estos son los monstruos", uniqueMonsterCards)
+    cards
+      .filter((card) => card.type === cardType)
+      .forEach((card) => {
+        if (!map.has(card.humanReadableCardType)) {
+          map.set(card.humanReadableCardType, card);
+        }
+      });
 
-  const spellCards = cards.filter((card) => card.type === "Spell Card");
-  const uniqueSpellCards = new Set(spellCards.map(card => card.humanReadableCardType));
-  console.log("Estos son los hechizos", uniqueSpellCards)
+    return Array.from(map.values());
+  };
 
-  const trapCards = cards.filter((card) => card.type === "Trap Card");
-  const uniqueTrapCards = new Set(trapCards.map(card => card.humanReadableCardType));
-  console.log("Estas son las trampas", uniqueTrapCards)
-  return <>
-  
-  </>;
+  const getOneExamplePerType = (cards:CardPayload[]) => {
+    const spellExamples = getOneExamplePerSubtype(cards, "Spell Card");
+    const trapExamples = getOneExamplePerSubtype(cards, "Trap Card");
+
+    console.log("Ejemplos de Spell por subtipo:", spellExamples);
+    console.log("Ejemplos de Trap por subtipo:", trapExamples);
+
+    return { spellExamples, trapExamples };
+  };
+
+  // Call the function to test it
+  const examples = getOneExamplePerType(cards);
+  console.log("Ejemplos por tipo:", cards.find((card) => card.name === "Kuriboh"));
+
+  return <></>;
 }
 
 export default App;
